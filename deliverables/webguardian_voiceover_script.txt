@@ -1,0 +1,47 @@
+WEBGUARDIAN AI — HACKATHON DEMO VIDEO
+Voice-over script (final, as used in webguardian_hackathon_demo.mp4)
+Total length: 2:35.8  ·  Voice: Kokoro-82M neural TTS (af_heart), generated offline
+
+0:00.0 – 0:06.0  INTRO (title card, music only)
+  On screen: WebGuardian AI · Autonomous AI Website QA Agent · Test. Explain. Fix. Verify.
+
+0:06.0 – 0:24.9  THE PROBLEM
+  With the rapid growth of AI-built and vibe-coded websites, hidden issues in accessibility, SEO, performance, usability, and functionality can easily go unnoticed. Developers need a faster and simpler way to identify these problems, and understand exactly what needs to be improved.
+
+0:26.4 – 0:31.6  STARTING AN AUDIT
+  Meet WebGuardian AI. Paste any public website address, and start an AI audit.
+
+0:33.0 – 0:48.4  LIVE AGENT — REAL BROWSER TESTING
+  The agent launches a real Chromium browser and tests the site the way real users experience it. Here, the keyboard-only persona moves through the page with the Tab key, like someone who can't use a mouse, and every step streams live to the dashboard.
+
+0:49.8 – 0:57.8  GEMINI ANALYSIS
+  The findings are then sent to Google Gemini on our backend, which summarizes the audit, and highlights exactly what to fix first.
+
+0:59.2 – 1:07.3  RESULTS & PRIORITIZATION
+  Every category gets a score, and each issue is prioritized by severity. On this site, thirteen issues, three of them critical.
+
+1:08.7 – 1:22.0  EVIDENCE
+  Open any issue to see what happened, who it affects, and why it matters. Each finding is backed by evidence: a screenshot captured by the agent, the CSS selector, the HTML, and the steps to reproduce it.
+
+1:23.4 – 1:39.5  FIXES & VERIFICATION
+  Every issue also explains how to fix it. Generate Fix asks Gemini for a code change you approve, and Verify Fix re-runs the same test to confirm it worked. The top critical issue here: navigation links that keyboard users simply cannot reach.
+
+1:40.9 – 1:47.8  AUDIT CHAT
+  You can also ask the audit chat questions, like, what should I fix first? Answers come only from this audit's evidence.
+
+1:49.2 – 2:11.5  CHROME EXTENSION
+  We also built a fully functional Chrome Extension that brings WebGuardian directly into the browsing experience. Users can analyze a website while browsing, and quickly understand its quality, detected issues, and areas that need improvement. Here it scores the site eighty-nine overall, and lists every issue with a clear description and how to fix it, right in the side panel.
+
+2:12.9 – 2:25.0  COMPLETE WORKFLOW
+  WebGuardian combines automated browser testing with AI-powered reasoning to detect issues, explain them clearly, suggest improvements, and verify whether those improvements actually work.
+
+2:26.4 – 2:34.4  CLOSING
+  WebGuardian AI makes website quality testing faster, clearer, and more accessible. From detection, to verified improvement.
+
+On-screen note (closing card):
+  Current demo is hosted on Render Free Tier. Higher-performance infrastructure can significantly improve processing and response speed.
+
+Notes:
+- All product footage comes from the six original screen recordings; waiting/loading time was cut and some sections were sped up (0.9x–2.3x).
+- Generate Fix / Verify Fix / Re-test are described as features over footage of those buttons; the recordings do not show a fix being applied.
+- Background music and sound effects are original, synthesized for this video (no third-party licensing).
