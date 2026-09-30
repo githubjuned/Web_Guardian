@@ -90,7 +90,7 @@ The detection engine finds and proves issues. Gemini explains, prioritises and p
 | **Backend / API** | _e.g. `https://<your-service>.onrender.com/api/health`_ |
 | **Repository** | https://github.com/githubjuned/web_guardian |
 
-**Free deployment:** Hugging Face Spaces (Docker) via the *Deploy to Hugging Face Spaces* GitHub Action or `scripts/deploy_hf.py` — see [docs/deployment.md](docs/deployment.md). The repository also includes a production `Dockerfile` (verified locally, including running as the uid Hugging Face uses), `render.yaml`, `fly.toml` and `frontend/vercel.json`.
+**Free deployment:** Render's free plan via `render.yaml` (tested under the free plan's 512 MB / 0.1 CPU limits; Lighthouse is disabled there) — see [docs/deployment.md](docs/deployment.md). The repository also includes a production `Dockerfile`, a Hugging Face Spaces deploy script (Docker Spaces need HF PRO), `fly.toml` and `frontend/vercel.json`.
 
 ## Architecture
 

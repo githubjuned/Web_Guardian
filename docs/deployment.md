@@ -2,26 +2,25 @@
 
 WebGuardian needs a **server that can run Chromium** (Playwright). A serverless frontend host alone cannot run the agent. The recommended setup is a single Docker service; optionally, the frontend can also be served from Vercel.
 
-## Free option — Hugging Face Spaces (recommended for the hackathon)
+## Free option — Render free plan (recommended for the hackathon)
 
-Hugging Face Spaces runs Docker apps for free (2 vCPU, 16 GB RAM, no credit card) — enough for Chromium and Lighthouse. You get a public URL like `https://<username>-webguardian-ai.hf.space`.
+Render's free web services run Docker without a credit card. The free instance is small (512 MB RAM, 0.1 CPU), so `render.yaml` disables Lighthouse and runs one audit at a time. Tested under the same limits: a full demo audit takes about **2.5 minutes** (peak memory ~420 MB) and every other detector completes.
 
-1. Create a free account at https://huggingface.co and a **write** token at https://huggingface.co/settings/tokens.
-2. Get a Gemini key at https://aistudio.google.com → *Get API key*.
-3. In this GitHub repo → **Settings → Secrets and variables → Actions**:
-   - Secret `HF_TOKEN` = the Hugging Face token
-   - Secret `GEMINI_API_KEY` = the Gemini key
-   - Variable `HF_SPACE` = `<hf-username>/webguardian-ai`
-4. **Actions → Deploy to Hugging Face Spaces → Run workflow**. The workflow creates the Space (Docker SDK), sets `PUBLIC_BASE_URL`, stores the Gemini key as a Space secret, and uploads the code.
-5. Open `https://huggingface.co/spaces/<hf-username>/webguardian-ai` to watch the build (~5–10 min), then use the app at `https://<hf-username>-webguardian-ai.hf.space`.
+1. Get a Gemini key at https://aistudio.google.com → *Get API key*.
+2. Sign in at https://render.com with GitHub and allow access to this repository.
+3. **New → Blueprint** → select the repository and branch → Render reads `render.yaml`.
+4. Fill in `GEMINI_API_KEY` and `PUBLIC_BASE_URL` = `https://webguardian-ai.onrender.com` (or the URL Render shows for the service) → **Apply**.
+5. Wait for the first build (~5–10 minutes), then open the URL and `/api/health`.
 
-Without GitHub Actions, run it from any computer:
+Free-plan notes: the service sleeps after ~15 minutes without traffic and takes about a minute to wake — open it before your demo. There is no persistent disk, so past audits disappear on restart/redeploy.
+
+## Hugging Face Spaces (requires Hugging Face PRO)
+
+Hugging Face now requires a PRO subscription for Docker Spaces. If you have PRO: set the GitHub secrets `HF_TOKEN` (write token) and `GEMINI_API_KEY` and the variable `HF_SPACE` = `<hf-username>/webguardian-ai`, then run **Actions → Deploy to Hugging Face Spaces**, or locally:
 ```bash
 pip install huggingface_hub
 HF_TOKEN=hf_xxx HF_SPACE=<hf-username>/webguardian-ai GEMINI_API_KEY=xxx python scripts/deploy_hf.py
 ```
-
-Notes: free Spaces sleep after 48 hours without visitors and wake on the next visit (about a minute); storage is not persistent, so past audits disappear on restart. The Space must stay **public** so judges can open it. Redeploy by running the workflow again.
 
 ## Option A — one Docker service (paid hosts)
 

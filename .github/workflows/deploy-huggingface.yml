@@ -1,6 +1,6 @@
 name: Deploy to Hugging Face Spaces
 
-# Free hosting: GitHub → Actions → "Deploy to Hugging Face Spaces" → Run workflow.
+# Requires Hugging Face PRO (Docker Spaces are not free). GitHub → Actions → "Deploy to Hugging Face Spaces" → Run workflow.
 # One-time setup (repo → Settings → Secrets and variables → Actions):
 #   Secret   HF_TOKEN        Hugging Face token with "write" permission
 #   Secret   GEMINI_API_KEY  Google AI Studio key (stored as a Space secret)
