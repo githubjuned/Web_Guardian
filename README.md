@@ -86,8 +86,8 @@ The detection engine finds and proves issues. Gemini explains, prioritises and p
 
 | | |
 |---|---|
-| **Live app** | _Not deployed yet — add your URL after following [docs/deployment.md](docs/deployment.md)_ |
-| **Backend / API** | _e.g. `https://<your-service>.onrender.com/api/health`_ |
+| **Live app** | https://webguardian-ai-mmgl.onrender.com (Render free plan — the first visit after inactivity takes ~1 minute to wake up) |
+| **Backend / API** | https://webguardian-ai-mmgl.onrender.com/api/health |
 | **Repository** | https://github.com/githubjuned/web_guardian |
 
 **Free deployment:** Render's free plan via `render.yaml` (tested under the free plan's 512 MB / 0.1 CPU limits; Lighthouse is disabled there) — see [docs/deployment.md](docs/deployment.md). The repository also includes a production `Dockerfile`, a Hugging Face Spaces deploy script (Docker Spaces need HF PRO), `fly.toml` and `frontend/vercel.json`.
