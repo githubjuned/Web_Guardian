@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - name: Backend tests (unit + real-browser integration)
+        run: npm run test -w backend
+      - name: Frontend tests
+        run: npm run test -w frontend
+      - name: Frontend build
+        run: npm run build -w frontend

@@ -1,0 +1,26 @@
+# Render Blueprint — deploys WebGuardian AI as one Docker web service.
+# Dashboard → New → Blueprint → select this repo. Then set GEMINI_API_KEY and PUBLIC_BASE_URL.
+services:
+  - type: web
+    name: webguardian-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: standard # Chromium + Lighthouse need ~1–2 GB RAM; the free plan (512 MB) is too small.
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false # set in the dashboard; never committed
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: PUBLIC_BASE_URL
+        sync: false # e.g. https://webguardian-ai.onrender.com
+      - key: FRONTEND_URL
+        sync: false # e.g. https://webguardian-ai.vercel.app (if the frontend is also on Vercel)
+      - key: MAX_CONCURRENT_AUDITS
+        value: "1"
+      - key: LIGHTHOUSE_ENABLED
+        value: "true"
+    disk:
+      name: webguardian-data
+      mountPath: /app/backend/data
+      sizeGB: 1

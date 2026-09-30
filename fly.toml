@@ -1,0 +1,37 @@
+# Fly.io — `fly launch --no-deploy` (keep this file), then:
+#   fly volumes create webguardian_data --size 1
+#   fly secrets set GEMINI_API_KEY=... PUBLIC_BASE_URL=https://<app>.fly.dev
+#   fly deploy
+app = "webguardian-ai"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  MAX_CONCURRENT_AUDITS = "1"
+  GEMINI_MODEL = "gemini-2.5-flash"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "20s"
+    interval = "30s"
+    method = "GET"
+    path = "/api/health"
+    timeout = "5s"
+
+[[vm]]
+  memory = "2gb"
+  cpu_kind = "shared"
+  cpus = 2
+
+[mounts]
+  source = "webguardian_data"
+  destination = "/app/backend/data"
