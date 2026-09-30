@@ -115,7 +115,7 @@ Full diagram, design decisions, state machine and data model: **[docs/architectu
 | Backend | Node.js 22, Express 5, TypeScript (run with tsx), zod |
 | Browser agent | Playwright (Chromium) |
 | Detection | axe-core (`@axe-core/playwright`), Lighthouse, DOM inspection, Resource Timing, HTTP link checks |
-| AI | Google Gemini via `@google/genai` (default model `gemini-2.5-flash`), JSON output validated with zod |
+| AI | Google Gemini via `@google/genai` (default model `gemini-3.8-flash`), JSON output validated with zod |
 | Storage | SQLite via Node's built-in `node:sqlite`; screenshots on disk |
 | Live events | Server-Sent Events (polling fallback) |
 | Deployment | Docker (Playwright base image) on Render / Fly.io / Cloud Run; optional Vercel frontend |
@@ -172,7 +172,7 @@ See [`.env.example`](.env.example).
 
 ```
 GEMINI_API_KEY=          # required for AI features (backend only)
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 DATABASE_URL=file:./data/webguardian.db
 PORT=8080
 FRONTEND_URL=http://localhost:5173

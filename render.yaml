@@ -16,7 +16,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false # set in the dashboard; never committed
       - key: GEMINI_MODEL
-        value: gemini-2.5-flash
+        value: gemini-3.8-flash
       - key: PUBLIC_BASE_URL
         sync: false # e.g. https://webguardian-ai.onrender.com
       - key: MAX_CONCURRENT_AUDITS

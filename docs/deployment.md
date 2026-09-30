@@ -73,7 +73,7 @@ gcloud run deploy webguardian --source . --region us-central1 --memory 2Gi --cpu
 | Variable | Required | Description |
 |---|---|---|
 | `GEMINI_API_KEY` | yes (for AI) | Google AI Studio key. Backend only. Without it the audit still runs with rule-based explanations. |
-| `GEMINI_MODEL` | no | Default `gemini-2.5-flash`. |
+| `GEMINI_MODEL` | no | Default `gemini-3.8-flash`. |
 | `PUBLIC_BASE_URL` | yes in the cloud | Public URL of the backend. Used to build demo-sandbox URLs and to allow-list the server's own origin. |
 | `FRONTEND_URL` | when split | Comma-separated allowed CORS origins. |
 | `PORT` | no | Default `8080`. |

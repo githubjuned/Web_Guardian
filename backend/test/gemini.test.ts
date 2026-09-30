@@ -54,6 +54,8 @@ describe('Gemini client', () => {
   it('maps rate limits and auth failures to friendly errors', async () => {
     await expect(scriptedClient([new Error('429 RESOURCE_EXHAUSTED quota')]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/rate limit/);
     await expect(scriptedClient([new Error('API key not valid')]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/API key/);
+    const retired = new Error('{"error":{"code":404,"message":"This model models/gemini-old is no longer available to new users."}}');
+    await expect(scriptedClient([retired]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/Set GEMINI_MODEL/);
   });
 });
 

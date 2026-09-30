@@ -93,6 +93,11 @@ export class GeminiClient implements AiClient {
         if (/api key|permission|unauthori[sz]ed|403|401/i.test(message)) {
           throw new AiUnavailableError('Gemini rejected the API key. Check GEMINI_API_KEY on the server.');
         }
+        if (/"code":\s*404|not found|no longer available|is not supported/i.test(message)) {
+          throw new AiUnavailableError(
+            `The Gemini model "${this.model}" is not available for this API key. Set GEMINI_MODEL on the server to a current model.`,
+          );
+        }
         if (/429|quota|rate/i.test(message)) {
           throw new AiUnavailableError('Gemini rate limit reached. Please try again in a minute.');
         }

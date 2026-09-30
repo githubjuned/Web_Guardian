@@ -39,7 +39,7 @@ export const config = {
     .map((s) => s.trim().replace(/\/$/, ''))
     .filter(Boolean),
   geminiApiKey: process.env.GEMINI_API_KEY ?? '',
-  geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
   geminiTimeoutMs: int(process.env.GEMINI_TIMEOUT_MS, 60_000),
   maxConcurrentAudits: int(process.env.MAX_CONCURRENT_AUDITS, 2),
   maxPagesLimit: 3,
