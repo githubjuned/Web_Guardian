@@ -1,0 +1,27 @@
+name: Deploy to Hugging Face Spaces
+
+# Free hosting: GitHub → Actions → "Deploy to Hugging Face Spaces" → Run workflow.
+# One-time setup (repo → Settings → Secrets and variables → Actions):
+#   Secret   HF_TOKEN        Hugging Face token with "write" permission
+#   Secret   GEMINI_API_KEY  Google AI Studio key (stored as a Space secret)
+#   Variable HF_SPACE        <hf-username>/webguardian-ai
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install huggingface_hub
+      - name: Upload to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/deploy_hf.py

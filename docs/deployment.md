@@ -2,7 +2,28 @@
 
 WebGuardian needs a **server that can run Chromium** (Playwright). A serverless frontend host alone cannot run the agent. The recommended setup is a single Docker service; optionally, the frontend can also be served from Vercel.
 
-## Option A — one Docker service (recommended)
+## Free option — Hugging Face Spaces (recommended for the hackathon)
+
+Hugging Face Spaces runs Docker apps for free (2 vCPU, 16 GB RAM, no credit card) — enough for Chromium and Lighthouse. You get a public URL like `https://<username>-webguardian-ai.hf.space`.
+
+1. Create a free account at https://huggingface.co and a **write** token at https://huggingface.co/settings/tokens.
+2. Get a Gemini key at https://aistudio.google.com → *Get API key*.
+3. In this GitHub repo → **Settings → Secrets and variables → Actions**:
+   - Secret `HF_TOKEN` = the Hugging Face token
+   - Secret `GEMINI_API_KEY` = the Gemini key
+   - Variable `HF_SPACE` = `<hf-username>/webguardian-ai`
+4. **Actions → Deploy to Hugging Face Spaces → Run workflow**. The workflow creates the Space (Docker SDK), sets `PUBLIC_BASE_URL`, stores the Gemini key as a Space secret, and uploads the code.
+5. Open `https://huggingface.co/spaces/<hf-username>/webguardian-ai` to watch the build (~5–10 min), then use the app at `https://<hf-username>-webguardian-ai.hf.space`.
+
+Without GitHub Actions, run it from any computer:
+```bash
+pip install huggingface_hub
+HF_TOKEN=hf_xxx HF_SPACE=<hf-username>/webguardian-ai GEMINI_API_KEY=xxx python scripts/deploy_hf.py
+```
+
+Notes: free Spaces sleep after 48 hours without visitors and wake on the next visit (about a minute); storage is not persistent, so past audits disappear on restart. The Space must stay **public** so judges can open it. Redeploy by running the workflow again.
+
+## Option A — one Docker service (paid hosts)
 
 The root `Dockerfile` builds the React app and runs the Express API, the Playwright agent, the demo site and the built frontend on one origin. It is based on the official `mcr.microsoft.com/playwright:v1.56.1-noble` image, which contains Chromium and its system libraries.
 

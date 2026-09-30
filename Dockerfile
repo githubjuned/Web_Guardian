@@ -26,11 +26,17 @@ RUN npm run build -w frontend
 COPY backend backend
 COPY demo-site demo-site
 
+# Some hosts (e.g. Hugging Face Spaces) can't receive binary files through git,
+# so regenerate the demo site's images when they were left out of the upload.
+RUN test -f demo-site/src/images/hero.png || node demo-site/scripts/generate-images.mjs
+
 ENV NODE_ENV=production \
     PORT=8080 \
+    HOME=/tmp \
     WEBGUARDIAN_DATA_DIR=/app/backend/data
-RUN mkdir -p /app/backend/data && chown -R pwuser:pwuser /app/backend/data
+# Writable by any user id: Hugging Face Spaces runs containers as uid 1000, not pwuser (1001).
+RUN mkdir -p /app/backend/data && chmod -R a+rwX /app/backend/data
 USER pwuser
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8080)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["npm", "run", "start", "-w", "backend"]
+CMD ["node", "--disable-warning=ExperimentalWarning", "--import", "tsx", "backend/src/index.ts"]
