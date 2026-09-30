@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brewly — Fresh Coffee, Delivered</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-mark">B</span>Brewly</a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn search-toggle"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+        <button class="icon-btn account-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></button>
+        <button class="icon-btn menu-toggle"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Small-batch roasters · Since 2019</span>
+          <div class="hero-title">Coffee worth waking up for.</div>
+          <p class="hero-subtitle">Specialty beans from independent farms, roasted to order and delivered to your door every two weeks. Skip, pause or cancel anytime.</p>
+          <div class="hero-cta">
+            <a href="products.html" class="btn btn-primary">Start your subscription</a>
+            <a href="#how-it-works" class="btn btn-ghost">How it works</a>
+          </div>
+          <p class="hero-note">Free shipping on your first bag.</p>
+        </div>
+        <div class="hero-media">
+          <img src="images/hero.png" class="hero-image">
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="how-it-works">
+      <div class="container">
+        <h2>How Brewly works</h2>
+        <div class="feature-grid">
+          <article class="feature">
+            <img src="images/icon-quiz.svg" class="feature-icon">
+            <h3>Take the taste quiz</h3>
+            <p>Tell us how you brew and what you love. We match you with beans you will actually enjoy.</p>
+          </article>
+          <article class="feature">
+            <img src="images/icon-roast.svg" class="feature-icon">
+            <h3>We roast to order</h3>
+            <p>Every bag is roasted within 48 hours of shipping so it arrives at peak freshness.</p>
+          </article>
+          <article class="feature">
+            <img src="images/icon-box.svg" class="feature-icon">
+            <h3>Delivered on your schedule</h3>
+            <p>Choose weekly, bi-weekly or monthly delivery. Change it anytime from your account.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="products">
+      <div class="container">
+        <h2>This month's roasts</h2>
+        <div class="product-grid">
+          <article class="product-card">
+            <img src="images/bag-ethiopia.svg" class="product-image">
+            <h3>Ethiopia Yirgacheffe</h3>
+            <p class="product-notes">Jasmine · Bergamot · Honey</p>
+            <p class="product-price">$18.00</p>
+            <a href="products.html#ethiopia" class="btn btn-outline">View roast</a>
+          </article>
+          <article class="product-card">
+            <img src="images/bag-colombia.svg" class="product-image">
+            <h3>Colombia Huila</h3>
+            <p class="product-notes">Caramel · Red apple · Cocoa</p>
+            <p class="product-price">$16.00</p>
+            <a href="products.html#colombia" class="btn btn-outline">View roast</a>
+          </article>
+          <article class="product-card">
+            <img src="images/bag-sumatra.svg" class="product-image">
+            <h3>Sumatra Mandheling</h3>
+            <p class="product-notes">Dark chocolate · Cedar · Spice</p>
+            <p class="product-price">$17.00</p>
+            <a href="products.html#sumatra" class="btn btn-outline">View roast</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="newsletter">
+      <div class="container newsletter-inner">
+        <div>
+          <h2>Get 15% off your first order</h2>
+          <p>Join 12,000 coffee lovers who get brewing guides and early access to limited roasts.</p>
+        </div>
+        <form class="newsletter-form" action="#" onsubmit="return false;">
+          <input type="email" placeholder="you@example.com">
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-brand">Brewly Coffee Co.</p>
+      <p class="footer-small">© 2026 Brewly Coffee Co. · 221 Roastery Lane, Portland, OR · All prices in USD.</p>
+    </div>
+  </footer>
+
+  <div id="cookie-banner" class="cookie-banner" hidden>
+    <p>We use cookies to improve your experience and remember your preferences. Read our <a href="#privacy">privacy policy</a> or <a href="#cookie-settings">customize settings</a>.</p>
+    <div class="cookie-actions">
+      <div class="btn btn-primary" tabindex="0" data-consent="accept">Accept all</div>
+      <div class="btn btn-ghost" tabindex="0" data-consent="reject">Reject</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

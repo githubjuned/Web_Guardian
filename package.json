@@ -1,0 +1,28 @@
+{
+  "name": "webguardian",
+  "private": true,
+  "version": "1.0.0",
+  "description": "WebGuardian AI — Autonomous AI Website QA Agent",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w frontend",
+    "start": "npm run start -w backend",
+    "test": "npm run test -w backend && npm run test -w frontend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend",
+    "demo-site": "node demo-site/serve.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "overrides": {
+    "playwright-core": "1.56.1"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
