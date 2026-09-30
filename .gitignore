@@ -13,3 +13,4 @@ data-test/
 
 # Rendered demo videos (large binaries; shared separately)
 deliverables/*.mp4
+deliverables/*.mp3
