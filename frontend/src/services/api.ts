@@ -31,8 +31,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const body = text ? safeJson(text) : null;
   if (!res.ok) {
     const b = body as { error?: string; details?: unknown } | null;
-    const detail = typeof b?.details === 'string' ? ` ${b.details}` : '';
-    throw new ApiError((b?.error ?? `Request failed (${res.status})`) + detail, res.status, b?.details);
+    // Prefer the specific explanation (e.g. "Gemini is busy right now…") over the generic title.
+    const message = typeof b?.details === 'string' && b.details ? b.details : (b?.error ?? `Request failed (${res.status})`);
+    throw new ApiError(message, res.status, b?.details);
   }
   return body as T;
 }

@@ -3,6 +3,7 @@
  */
 import type { Browser, BrowserContext } from 'playwright';
 import type { DetectorContext, RawFinding } from './types';
+import { settlePage } from '../agents/pageHelpers';
 
 export async function runMobileChecks(
   browser: Browser,
@@ -23,7 +24,8 @@ export async function runMobileChecks(
   try {
     await prepare(context);
     const page = await context.newPage();
-    await page.goto(ctx.pageUrl, { waitUntil: 'load', timeout: timeoutMs });
+    await page.goto(ctx.pageUrl, { waitUntil: 'domcontentloaded', timeout: timeoutMs });
+    await settlePage(page);
     const overflow = await page.evaluate(() => {
       const vw = document.documentElement.clientWidth;
       const scrollWidth = document.documentElement.scrollWidth;

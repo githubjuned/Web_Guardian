@@ -1,3 +1,5 @@
+import type { Page } from 'playwright';
+
 /**
  * In-page helpers installed into every document the agent opens (via addInitScript).
  * They draw the "agent cursor" highlight used in live frames and evidence
@@ -59,3 +61,21 @@ globalThis.__name = globalThis.__name || ((fn) => fn);
   window.__wg = { cssPath, highlight, clearHighlight };
 })();
 `;
+
+/** How long to wait for images/scripts after the HTML is ready before testing anyway. */
+export const LOAD_GRACE_MS = 10_000;
+
+/**
+ * Waits for the page to finish loading, up to LOAD_GRACE_MS. If something is still
+ * pending (a hanging tracker, a never-ending image), it presses "stop" like a user
+ * would, so screenshots and inspections don't stall behind it. Returns true if the
+ * page loaded fully on its own.
+ */
+export async function settlePage(page: Page, graceMs = LOAD_GRACE_MS): Promise<boolean> {
+  const loaded = await page
+    .waitForLoadState('load', { timeout: graceMs })
+    .then(() => true)
+    .catch(() => false);
+  if (!loaded) await page.evaluate(() => window.stop()).catch(() => undefined);
+  return loaded;
+}

@@ -24,7 +24,7 @@ import { runLighthouse } from '../detectors/lighthouse';
 import type { DetectorContext, RawFinding } from '../detectors/types';
 import { runKeyboardPersona } from '../personas/keyboard';
 import { discoverLinks, samePage } from './crawler';
-import { HELPER_SCRIPT } from './pageHelpers';
+import { HELPER_SCRIPT, LOAD_GRACE_MS, settlePage } from './pageHelpers';
 import { errorMessage, logger } from '../utils/logger';
 import { isLocalHostname } from '../utils/url';
 
@@ -113,12 +113,34 @@ async function prepareContext(context: BrowserContext, opts: Pick<ScanOptions, '
   context.setDefaultTimeout(15_000);
   await context.addInitScript(HELPER_SCRIPT);
   if (!config.allowPrivateUrls) {
-    // Block page sub-requests to private/local addresses (SSRF protection).
-    await context.route('**/*', (route) =>
+    // Block page sub-requests to private/local addresses (SSRF protection). The pattern is
+    // matched inside the browser driver, so ordinary public requests never pay for a round
+    // trip through Node — important on small instances and asset-heavy sites.
+    await context.route(PRIVATE_HOST_PATTERN, (route) =>
       shouldBlock(route.request().url(), opts.trustedOrigins) ? route.abort('blockedbyclient') : route.continue(),
     );
   }
 }
+
+/** Hosts that may point inside the server's network: loopback, RFC 1918, link-local/metadata, *.internal. */
+export const PRIVATE_HOST_PATTERN =
+  /^[a-z][a-z0-9+.-]*:\/\/(?:[^/@]*@)?(?:localhost|[^/:]*\.localhost|[^/:]*\.internal|127\.|10\.|0\.0\.0\.0|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.|169\.254\.|100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|\[(?:::1|::ffff:|f[cd]|fe80)[^\]]*\])/i;
+
+/** Rejects if `promise` takes longer than `ms`, so one slow step can't stall the audit. */
+function withTimeout<T>(promise: Promise<T>, ms: number, what: string): Promise<T> {
+  let timer: NodeJS.Timeout;
+  return Promise.race([
+    promise.finally(() => clearTimeout(timer)),
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${what} took longer than ${Math.round(ms / 1000)}s`)), ms);
+    }),
+  ]);
+}
+
+/** Per-detector time budget. Generous for 0.1-CPU free instances, bounded so an audit always finishes. */
+const DETECTOR_TIMEOUT_MS = 120_000;
+
+
 
 export async function runScan(opts: ScanOptions): Promise<ScanResult> {
   const detectorErrors: Partial<Record<DetectorName, string>> = {};
@@ -235,8 +257,11 @@ export async function runScan(opts: ScanOptions): Promise<ScanResult> {
       try {
         const started = Date.now();
         let response;
+        opts.log('action', `Opening ${url} — waiting for the server to respond…`);
         try {
-          response = await page.goto(url, { waitUntil: 'load' });
+          // Continue as soon as the HTML is ready; heavy sites often have a tracker or
+          // image that keeps the full "load" event pending for a long time.
+          response = await page.goto(url, { waitUntil: 'domcontentloaded' });
         } catch (err) {
           const message = errorMessage(err).split('\n')[0];
           pages.push({ url, title: null, status: 'failed', httpStatus: null, error: message });
@@ -254,7 +279,12 @@ export async function runScan(opts: ScanOptions): Promise<ScanResult> {
           opts.log('action', `Skipping ${url} (not an HTML page)`);
           continue;
         }
-        await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => undefined);
+        await frame(`Page ${pageIndex + 1} is loading…`);
+        const fullyLoaded = await settlePage(page);
+        if (!fullyLoaded) {
+          opts.log('warning', `Some resources were still loading after ${LOAD_GRACE_MS / 1000}s — stopped them and testing what has rendered`);
+        }
+        await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => undefined);
         const finalUrl = page.url();
         if (new URL(finalUrl).origin !== origin && pageIndex === 0) {
           opts.log('warning', `Redirected to ${finalUrl}`);
@@ -284,7 +314,7 @@ export async function runScan(opts: ScanOptions): Promise<ScanResult> {
         const run = async <T>(name: DetectorName, fn: () => Promise<T>): Promise<T | null> => {
           opts.onDetector(name, 'running');
           try {
-            const result = await fn();
+            const result = await withTimeout(fn(), DETECTOR_TIMEOUT_MS, name);
             if (!detectorErrors[name]) opts.onDetector(name, 'completed');
             return result;
           } catch (err) {
@@ -343,7 +373,8 @@ export async function runScan(opts: ScanOptions): Promise<ScanResult> {
 
         // 5. Keyboard-only persona (interactive)
         if (!opts.skipKeyboard) {
-          await page.reload({ waitUntil: 'load' }).catch(() => undefined);
+          await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+          await settlePage(page);
           const kb = await run('keyboard-persona', () => runKeyboardPersona(page, ctx));
           if (kb) {
             for (const f of kb.findings) if (!f.screenshotPath) f.screenshotPath = pageShot;

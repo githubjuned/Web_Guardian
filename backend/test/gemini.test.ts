@@ -6,21 +6,32 @@ import { FixSchema, SummarySchema } from '../src/ai/schemas';
 import { proposeFix, summarizeAudit } from '../src/ai/service';
 
 /** A real GeminiClient whose network transport is replaced by scripted responses. */
-function scriptedClient(responses: (string | Error)[]) {
-  const client = new GeminiClient('test-key', 'gemini-test');
+function scriptedClient(responses: (string | Error)[], availableModels: string[] = []) {
+  const client = new GeminiClient('test-key', 'gemini-test', []);
+  client.sleep = async () => undefined;
   const prompts: string[] = [];
+  const models: string[] = [];
   (client as unknown as { client: unknown }).client = {
     models: {
-      generateContent: async (req: { contents: { parts: { text?: string }[] }[] }) => {
+      generateContent: async (req: { model: string; contents: { parts: { text?: string }[] }[] }) => {
         prompts.push(req.contents[0].parts[0].text ?? '');
+        models.push(req.model);
         const next = responses.shift();
         if (next instanceof Error) throw next;
+        if (next === undefined) throw new Error('no scripted response left');
         return { text: next };
       },
+      list: async () =>
+        (async function* () {
+          for (const name of availableModels) yield { name: `models/${name}`, supportedActions: ['generateContent'] };
+        })(),
     },
   };
-  return { client, prompts };
+  return { client, prompts, models };
 }
+
+const busy = () => new Error('{"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}');
+const retired = () => new Error('{"error":{"code":404,"message":"This model models/gemini-test is no longer available to new users."}}');
 
 const audit = { id: 'audit_1', url: 'https://shop.example/', pages: [], scoresBefore: null, issueCounts: {}, lighthouse: null } as unknown as Audit;
 const issue = (n: number): Issue =>
@@ -52,10 +63,30 @@ describe('Gemini client', () => {
   });
 
   it('maps rate limits and auth failures to friendly errors', async () => {
-    await expect(scriptedClient([new Error('429 RESOURCE_EXHAUSTED quota')]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/rate limit/);
+    const limited = () => new Error('429 RESOURCE_EXHAUSTED quota');
+    await expect(scriptedClient([limited(), limited(), limited()]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/busy right now/);
+    await expect(scriptedClient([new Error('429 quota exceeded: requests per day')]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/quota/);
     await expect(scriptedClient([new Error('API key not valid')]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/API key/);
-    const retired = new Error('{"error":{"code":404,"message":"This model models/gemini-old is no longer available to new users."}}');
-    await expect(scriptedClient([retired]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/Set GEMINI_MODEL/);
+    await expect(scriptedClient([retired()]).client.generateJson({ system: '', prompt: '', schema: z.object({}) })).rejects.toThrow(/Set GEMINI_MODEL/);
+  });
+
+  it('retries automatically when Gemini is busy (503) and then succeeds', async () => {
+    const { client, models } = scriptedClient([busy(), busy(), '{"a": 1}']);
+    expect(await client.generateJson({ system: '', prompt: 'p', schema: z.object({ a: z.number() }) })).toEqual({ a: 1 });
+    expect(models).toEqual(['gemini-test', 'gemini-test', 'gemini-test']);
+  });
+
+  it('falls back to another available Flash model when the configured one stays busy', async () => {
+    const { client, models } = scriptedClient([busy(), busy(), busy(), '{"a": 2}'], ['gemini-9.0-pro', 'gemini-3.9-flash', 'gemini-3.9-flash-image']);
+    expect(await client.generateJson({ system: '', prompt: 'p', schema: z.object({ a: z.number() }) })).toEqual({ a: 2 });
+    expect(models.at(-1)).toBe('gemini-3.9-flash');
+    expect(client.model).toBe('gemini-3.9-flash'); // later requests go straight to the working model
+  });
+
+  it('switches model immediately when the configured model is retired (404)', async () => {
+    const { client, models } = scriptedClient([retired(), '{"a": 3}'], ['gemini-3.9-flash-lite', 'gemini-4.0-flash']);
+    expect(await client.generateJson({ system: '', prompt: 'p', schema: z.object({ a: z.number() }) })).toEqual({ a: 3 });
+    expect(models).toEqual(['gemini-test', 'gemini-4.0-flash']);
   });
 });
 
